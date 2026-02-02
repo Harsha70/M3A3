@@ -8,7 +8,7 @@ export async function pollWithRetry(
   let attempt = 0;
   while (attempt < maxRetries) {
     try {
-      // console.log(`Attempt ${attempt + 1} of ${maxRetries}`);
+      console.log(`Attempt ${attempt + 1} of ${maxRetries}`);
       const res = await axios.get(
         `http://localhost:3010/status-live/${userId}`,
         { timeout: 35000 }
