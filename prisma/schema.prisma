@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id             Int     @id @default(autoincrement())
+  username       String?
+  profileImage   String? @map("profile_image")
+  thumbnailImage String? @map("thumbnail_image")
+
+  @@map("users") 
+}
+
