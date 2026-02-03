@@ -1,6 +1,6 @@
 import express from "express";
 import { Server } from "socket.io";
-import { createServer } from "http";
+import { createServer, get } from "http";
 import { createClient } from "redis";
 import "dotenv/config";
 import axios from "axios";
@@ -85,6 +85,33 @@ io.on("connection", async (socket) => {
   const data = await getLeaderboard();
   socket.emit("current_leaderboard", data);
 });
+
+app.get("/leaderboard-feed", async (req, res) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  console.log("Client joined SSE feed")
+
+  const sendUpdate = async () => {
+    const data = await getLeaderboard();
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
+  }
+
+  sendUpdate();
+
+  const sub = redisClient.duplicate();
+  await sub.connect();
+
+  await sub.subscribe("leaderboard_update", sendUpdate);
+
+  req.on("close", async () => {
+    console.log("Client left SSE feed");
+    await sub.unsubscribe("leaderboard_update", sendUpdate);
+    await sub.quit();
+    res.end();
+  })
+  
+})
 
 app.post("/score", async (req, res) => {
   const { username, score } = req.body;
