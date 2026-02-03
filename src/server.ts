@@ -44,6 +44,27 @@ app.post("/enqueue", async (req: Request, res: Response) => {
   res.status(200).json({ message: "Image received and event broadcasted!" });
 });
 
+app.get("/status/:userId", async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const user = await prisma.user.findUnique({
+    where: { id: Number(userId) },
+    select: { thumbnailImage: true },
+  });
+  if (!user) {
+    return res.status(404).json({ status: "error", message: "User not found" });
+  }
+  if (user.thumbnailImage) {
+    return res.json({
+      status: "done",
+      thumbnailUrl: user.thumbnailImage,
+    });
+  }
+  return res.json({
+    status: "pending",
+    message: "Thumbnail is still being generated.",
+  });
+});
+
 app.get("/status-live/:userId", async (req: Request, res: Response) => {
   const { userId } = req.params;
   const channel = `finished:${userId}`;

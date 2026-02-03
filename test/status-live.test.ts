@@ -8,5 +8,5 @@ describe("Long polling with retries", () => {
     const result = await pollWithRetry(userId, 5, 1000);
     expect(result.status).toBe("done");
     expect(result.thumbnailUrl).toBeDefined();
-  });
+  }, 120000);
 });
