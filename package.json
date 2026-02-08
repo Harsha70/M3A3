@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "dev2": "nodemon src/game_order.server.ts",
+    "dev3": "nodemon M3A4/server.ts",
     "test": "jest test/status-live.test.ts",
     "test2": "node --experimental-vm-modules node_modules/.bin/jest test/status-live.test.ts"
   },
@@ -25,13 +26,17 @@
     "@prisma/adapter-better-sqlite3": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "axios": "^1.13.4",
+    "bullmq": "^5.67.3",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "ioredis": "^5.9.2",
     "nanoid": "^5.1.6",
     "redis": "^5.10.0",
+    "resend": "^6.9.1",
     "sharp": "^0.34.5",
     "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3"
+    "socket.io-client": "^4.8.3",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
