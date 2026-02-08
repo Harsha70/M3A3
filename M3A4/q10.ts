@@ -1,22 +1,3 @@
-/**
- * q10: Same behaviour as q6 (task queue, retries, exponential backoff, DLQ, email alert)
- * but implemented with BullMQ instead of raw Redis lists.
- *
- * --- What was EASY with BullMQ vs q6 (first principles) ---
- * • No manual queue wiring: one Queue + one Worker replace main queue, retry queue,
- *   and separate main/retry workers. No blPop loops or multiple Redis clients for queues.
- * • Retries + backoff are declarative: `attempts: 4` and `backoff: { type: 'exponential', delay: 1000 }`
- *   replace custom retry queue, retry worker loop, and getBackoffDelayMs().
- * • Failed jobs are stored and queryable by BullMQ; no separate DLQ Redis list unless we want it.
- * • Less code: no seed() that quits a producer, no careful separation of main vs retry clients.
- *
- * --- What was HARD or required care ---
- * • Different Redis client: BullMQ uses ioredis (Redis class; connection options, maxRetriesPerRequest: null for workers),
- *   while q6 used node-redis. We still use node-redis for idempotent state (task_progress:*).
- * • DLQ alerting: BullMQ emits "failed" on every failed attempt, so we must check
- *   job.attemptsMade >= job.opts.attempts to send email only when retries are exhausted.
- * • Understanding BullMQ’s key layout and connection usage (blocking vs non-blocking) if reusing connections.
- */
 import { createClient } from "redis";
 import { Queue, Worker } from "bullmq";
 import { Resend } from "resend";
