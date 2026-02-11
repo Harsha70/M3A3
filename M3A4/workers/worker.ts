@@ -19,7 +19,6 @@ async function startWorker() {
   console.log("Worker online. Listening for videos tasks ...");
 
   while (true) {
-    // BLPOP blocks until a message is available in 'task_queue'
     const result = await client.blPop(QUEUE_NAME, 0);
     console.log("result", result);
     if (!result) continue;
@@ -35,7 +34,6 @@ async function startWorker() {
       );
       console.log(`Transcoding: ${task.id}`);
 
-      // Simulated Heavy work
       if (task.url == "fail-me") throw new Error("Codec Error");
       await new Promise((r) => setTimeout(r, 3000));
 

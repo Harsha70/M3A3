@@ -173,7 +173,6 @@ async function processTask(task: Task) {
   const { id } = task;
   const statusKey = `task_progress:${id}`;
 
-  // Charge Payment
   if (!(await stateClient.sIsMember(statusKey, "payment_done"))) {
     console.log("Step 1: Charging payment...");
     await new Promise((r) => setTimeout(r, 5000));
@@ -181,12 +180,10 @@ async function processTask(task: Task) {
     await stateClient.expire(statusKey, 86400);
   }
 
-  // Update Inventory
   if (!(await stateClient.sIsMember(statusKey, "inventory_updated"))) {
     console.log("Step 2: Updating inventory...");
     await new Promise((r) => setTimeout(r, 5000));
 
-    // SIMULATED FAILURE (uncomment to test retries + backoff):
     if (id == "order_2") {
       throw new Error("Database connection lost during inventory update!");
     }

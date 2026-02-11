@@ -39,7 +39,6 @@ async function startWorker() {
   console.log("Worker online. Listening for tasks...");
 
   while (true) {
-    // 1. Dequeue: Get the next task (Blocking Pop)
     const result = await client.blPop(MAIN_QUEUE, 0);
     if (!result) continue;
 
@@ -51,24 +50,20 @@ async function startWorker() {
         `Processing Task: ${task.id} (Attempt: ${task.retryCount || 0})`
       );
 
-      // 2. Execute Business Logic
       await processTaskLogic(task);
 
       console.log(`Task ${task.id} completed successfully.`);
     } catch (error: any) {
       console.error(`Error in Task ${task.id}: ${error.message}`);
 
-      // 3. Error Handling Logic
       task.retryCount = (task.retryCount || 0) + 1;
 
       if (task.retryCount >= MAX_RETRIES) {
-        // POISON PILL: Move to Dead Letter Queue
         console.log(
           `Task ${task.id} failed ${MAX_RETRIES} times. Moving to DLQ.`
         );
         await client.rPush(DLQ, JSON.stringify(task));
       } else {
-        // RETRY: Push back to the end of the main queue
         console.log(
           `Retrying Task ${task.id} (Total retries: ${task.retryCount})...`
         );

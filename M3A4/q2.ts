@@ -42,7 +42,7 @@ async function startMainWorker() {
   console.log("Main Worker online. Listening for tasks...");
 
   while (true) {
-    // 1. Dequeue: Get the next task (Blocking Pop)
+    // Get the next task (Blocking Pop)
     const result = await client.blPop(MAIN_QUEUE, 0);
     if (!result) continue;
 
@@ -54,7 +54,6 @@ async function startMainWorker() {
         `Processing Task: ${task.id} (Attempt: ${task.retryCount || 0})`
       );
 
-      // 2. Execute Business Logic
       await processTaskLogic(task);
 
       console.log(`Task ${task.id} completed successfully.`);
