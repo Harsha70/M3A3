@@ -1,4 +1,3 @@
-// src/producer.ts
 import { Kafka, Partitioners } from "kafkajs";
 
 const kafka = new Kafka({
@@ -32,12 +31,50 @@ async function sendEvents() {
     },
   ];
 
+  const payment_event = [
+    {
+      order_id: "Order_001",
+      amount: 66,
+    },
+    {
+      order_id: "Order_002",
+      amount: 65,
+    },
+  ];
+
+  const inventory_event = [
+    {
+      order_id: "Order_001",
+      inventory: 66,
+    },
+    {
+      order_id: "Order_002",
+      inventory: 65,
+    },
+  ];
+
   for (const event of events) {
     await producer.send({
       topic: "orders",
       messages: [{ value: JSON.stringify(event) }],
     });
-    console.log(`📤 Sent V${event.event_version} event: ${event.order_id}`);
+    console.log(`Sent V${event.event_version} event: ${event.order_id}`);
+  }
+
+  for (const event of payment_event) {
+    await producer.send({
+      topic: "payment-events",
+      messages: [{ value: JSON.stringify(event) }],
+    });
+    console.log("payment event sequence");
+  }
+
+  for (const event of inventory_event) {
+    await producer.send({
+      topic: "inventory-events",
+      messages: [{ value: JSON.stringify(event) }],
+    });
+    console.log("inventory event sequence");
   }
 
   await producer.disconnect();
